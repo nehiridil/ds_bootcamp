@@ -128,8 +128,8 @@ def ls(x, y, alpha=0.001, verbose=False) -> np.ndarray:
 
     return beta
 
-#buna dön sonra
-def ls_custom(x, y, alpha=0.001, verbose=False) -> np.ndarray:
+
+def ls_custom(x, y, alpha=0.000001, verbose=False) -> np.ndarray:
     beta = np.random.random(2)
     if verbose:
         st.write(beta)
@@ -137,16 +137,13 @@ def ls_custom(x, y, alpha=0.001, verbose=False) -> np.ndarray:
     print("starting sgd")
     for i in range(100):
         y_pred: np.ndarray = beta[0] + beta[1] * x
-        print(f"y_pred: {y_pred} ")
-
 
         g_b0 = (((y_pred - y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(y_pred-y) + np.exp(5)),2) * np.absolute(y_pred-y)).sum()
-        g_b1 = (x * (y_pred-y) * np.exp(np.absolute(y_pred-y)+5)) / np.power(np.exp(np.absolute(y_pred-y)) + np.exp(5),2) * np.absolute(y_pred-y).sum()
+        g_b1 = ((x * (y_pred-y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(np.absolute(y_pred-y)) + np.exp(5)),2) * np.absolute(y_pred-y)).sum()
 
         print(f"({i}) beta: {beta}, gradient: {g_b0} {g_b1}")
 
         beta_prev = np.copy(beta)
-
         beta[0] = beta[0] - alpha * g_b0
         beta[1] = beta[1] - alpha * g_b1
 
@@ -270,47 +267,5 @@ st.latex(
     r"\frac{\partial L}{\partial \beta_1} =  \sum^{N}_{i=1}{ \frac {x_i*(\beta_0 + \beta_1*x_i -y_i) * e^{|\beta_0-y_i+x_i*\beta_1|+5}} "
     r"{(e^{|\beta_0-y_i+x_i*\beta_1|} + e^5)^2 * |\beta_0 - y_i + x_i*\beta_1|}}")
 
-#beta = ls_custom(x[:, 0], y)
-#st.latex(fr"\beta_0={beta[0]:.4f}, \beta_1={beta[1]:.4f}")
-
-
-
-"""
-for beta_0 in np.linspace(-5, 5, 10):
-    for beta_1 in np.linspace(-5, 5, 10):
-        for x in np.linspace(-5, 5, 10):
-            y_hat_list.append(y - (beta_1 * x + beta_0))
-            losses.append((1 / (1 + np.exp(5 + (np.absolute(y - (beta_1 * x + beta_0)) * -1)))).mean())
-
-l = pd.DataFrame(dict(y_hat_list=y_hat_list, losses=losses))
-
-fig = px.scatter(l, x="y_hat_list", y="loss_list")
-st.plotly_chart(fig, use_container_width=True)
-"""
-
-
-
-
-"""
-cal_housing = fetch_california_housing()
-X = pd.DataFrame(cal_housing.data, columns=cal_housing.feature_names)
-y = cal_housing.target
-
-st.dataframe(X)
-st.dataframe(y)
-
-df = pd.DataFrame(
-    dict(MedInc=X['MedInc'], Price=cal_housing.target))
-
-st.header("All Models")
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=X.values[:, 0], y=y, mode='markers', name='data points'))
-fig.add_trace(
-    go.Scatter(x=X.values[:, 0], y=np.full(X.values.shape[0], fill_value=np.mean(y)), mode='lines', name='bias only'))
-
-beta = ls(X.values[:, 0], y)
-fig.add_trace(go.Scatter(x=X.values[:, 0], y=beta[0] + beta[1] * X.values[:, 0], mode='lines', name='least square'))
-
-
-st.plotly_chart(fig, use_container_width=True)
-"""
+beta = ls_custom(x, y)
+st.latex(fr"\beta_0={beta[0]:.4f}, \beta_1={beta[1]:.4f}")
