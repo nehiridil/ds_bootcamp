@@ -137,6 +137,8 @@ def ls_custom(x, y, alpha=0.000001, verbose=False) -> np.ndarray:
     print("starting sgd")
     for i in range(100):
         y_pred: np.ndarray = beta[0] + beta[1] * x
+        print(f"y_pred: {y_pred} ")
+
 
         g_b0 = (((y_pred - y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(y_pred-y) + np.exp(5)),2) * np.absolute(y_pred-y)).sum()
         g_b1 = ((x * (y_pred-y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(np.absolute(y_pred-y)) + np.exp(5)),2) * np.absolute(y_pred-y)).sum()
@@ -144,6 +146,7 @@ def ls_custom(x, y, alpha=0.000001, verbose=False) -> np.ndarray:
         print(f"({i}) beta: {beta}, gradient: {g_b0} {g_b1}")
 
         beta_prev = np.copy(beta)
+        print(g_b1)
         beta[0] = beta[0] - alpha * g_b0
         beta[1] = beta[1] - alpha * g_b1
 
@@ -267,5 +270,22 @@ st.latex(
     r"\frac{\partial L}{\partial \beta_1} =  \sum^{N}_{i=1}{ \frac {x_i*(\beta_0 + \beta_1*x_i -y_i) * e^{|\beta_0-y_i+x_i*\beta_1|+5}} "
     r"{(e^{|\beta_0-y_i+x_i*\beta_1|} + e^5)^2 * |\beta_0 - y_i + x_i*\beta_1|}}")
 
-beta = ls_custom(x, y)
-st.latex(fr"\beta_0={beta[0]:.4f}, \beta_1={beta[1]:.4f}")
+beta_custom = ls_custom(x, y)
+
+st.latex(fr"\beta_0={beta_custom[0]:.4f}, \beta_1={beta_custom[1]:.4f}")
+##WE DO
+beta_ls = ls(x,y)
+
+
+
+y_pred_custom = beta_custom[0] + beta_custom[1] * x
+#y_pred_wedo_ls = beta_ls[0] + beta_ls[1] * x
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=x, y=y, mode='markers', name='data points'))
+fig.add_trace(go.Scatter(x=x, y=y_pred_custom, mode='lines', name='predictions_with_custom_loss_func'))
+#fig.add_trace(go.Scatter(x=x, y=y_pred_wedo_ls, mode='lines', name='predictions_with_ls'))
+
+st.plotly_chart(fig, use_container_width=True)
+
+
