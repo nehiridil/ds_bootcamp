@@ -129,7 +129,7 @@ def ls(x, y, alpha=0.001, verbose=False) -> np.ndarray:
     return beta
 
 
-def ls_custom(x, y, alpha=0.000001, verbose=False) -> np.ndarray:
+def ls_custom(x, y, theta = 5, alpha=0.000001, verbose=False) -> np.ndarray:
     beta = np.random.random(2)
     if verbose:
         st.write(beta)
@@ -140,8 +140,8 @@ def ls_custom(x, y, alpha=0.000001, verbose=False) -> np.ndarray:
         print(f"y_pred: {y_pred} ")
 
 
-        g_b0 = (((y_pred - y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(y_pred-y) + np.exp(5)),2) * np.absolute(y_pred-y)).sum()
-        g_b1 = ((x * (y_pred-y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(np.absolute(y_pred-y)) + np.exp(5)),2) * np.absolute(y_pred-y)).sum()
+        g_b0 = (((y_pred - y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(y_pred-y) + np.exp(theta)),2) * np.absolute(y_pred-y)).sum()
+        g_b1 = ((x * (y_pred-y) * np.exp(np.absolute(y_pred-y)+5)) / np.power((np.exp(np.absolute(y_pred-y)) + np.exp(theta)),2) * np.absolute(y_pred-y)).sum()
 
         print(f"({i}) beta: {beta}, gradient: {g_b0} {g_b1}")
 
@@ -231,7 +231,7 @@ st.latex(r"y = \beta_0 + \beta_1 x = {\beta} ^T x")
 
 st.markdown(r"Our custom loss function can be written as")
 
-st.latex(r"L(\beta_0, \beta_1) = \sum_{i=1}^{N}{\frac{1}{(1 + e^{(-|-(y_i - (\beta_0 + \beta_1 x_i))|)+5})}}")
+st.latex(r"L(\beta_0, \beta_1) = \sum_{i=1}^{N}{\frac{1}{(1 + e^{(-|-(y_i - (\beta_0 + \beta_1 x_i))|)+\theta})}}")
 
 n = 100
 
@@ -247,10 +247,11 @@ x = x['MedInc'].values
 losses = []
 y_hat_list = []
 distances = []
+threshold = st.slider("Threshold", 0., 10., value=5.)
 for y_actual in np.linspace(-10, 10, 100):
     for y_pred in np.linspace(-10, 10, 100):
         distances.append(y_actual-y_pred)
-        losses.append((1 / (1 + np.exp(5 + (np.absolute(y_actual-y_pred) * -1)))).mean())
+        losses.append((1 / (1 + np.exp(threshold + (np.absolute(y_actual-y_pred) * -1)))).mean())
 
 l = pd.DataFrame(dict(distances=distances, losses=losses))
 st.markdown("#### Custom Loss Func. Convexity Check")
@@ -264,13 +265,13 @@ st.markdown(
             r"Given that $L$ is convex wrt both $\beta_0$ and $\beta_1$, "
             r"we can use Gradient Descent to find  $\beta_0^{*}$ and $\beta_1^{*}$ by using partial derivatives")
 st.latex(
-    r"\frac{\partial L}{\partial \beta_0} =  \sum^{N}_{i=1}{ \frac {(\beta_0 + \beta_1 * x_i - y_i) * e^{|\beta_0 + \beta_1 * x_i - y_i|+5}} "
+    r"\frac{\partial L}{\partial \beta_0} =  \sum^{N}_{i=1}{ \frac {(\beta_0 + \beta_1 * x_i - y_i) * e^{|\beta_0 + \beta_1 * x_i - y_i|+\theta}} "
     r"{(e^{\beta_0 + \beta_1 * x_i-y_i} + e^5)^2 *  |\beta_0 + \beta_1*x_i - y_i| }}")
 st.latex(
-    r"\frac{\partial L}{\partial \beta_1} =  \sum^{N}_{i=1}{ \frac {x_i*(\beta_0 + \beta_1*x_i -y_i) * e^{|\beta_0-y_i+x_i*\beta_1|+5}} "
+    r"\frac{\partial L}{\partial \beta_1} =  \sum^{N}_{i=1}{ \frac {x_i*(\beta_0 + \beta_1*x_i -y_i) * e^{|\beta_0-y_i+x_i*\beta_1|+\theta}} "
     r"{(e^{|\beta_0-y_i+x_i*\beta_1|} + e^5)^2 * |\beta_0 - y_i + x_i*\beta_1|}}")
 
-beta_custom = ls_custom(x, y)
+beta_custom = ls_custom(x, y, threshold)
 
 st.latex(fr"\beta_0={beta_custom[0]:.4f}, \beta_1={beta_custom[1]:.4f}")
 ##WE DO
