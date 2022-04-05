@@ -130,6 +130,6 @@ if __name__ == '__main__':
         print("**For lambda " + str(hyperparameter_lambda))
         beta_user_modified, beta_item_modified = ls_recommender_modified(r_train, alpha=0.001,
                                                                          hyperparameter_lambda=hyperparameter_lambda)
-        error = calc_err_modified(beta_user_modified, beta_item_modified, r_test, 0.01)
+        error = calc_err_modified(beta_user_modified, beta_item_modified, r_test, hyperparameter_lambda)
         print('Error: ' + str(error))
 
