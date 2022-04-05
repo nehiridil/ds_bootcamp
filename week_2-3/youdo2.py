@@ -56,10 +56,10 @@ def ls_recommender_modified(r, alpha=0.001, hyperparameter_lambda=0.01) -> np.nd
         beta_prev_item = np.copy(beta_item)
 
         for i in range(len(beta_user)):
-            beta_user[i] = beta_user[i] - (np.nansum(g_b0[i]) * alpha)
+            beta_user[i] = beta_user[i] - (np.nansum(g_b_user[i]) * alpha)
 
         for j in range(len(beta_item)):
-            beta_item[j] = beta_item[j] - (np.nansum(g_b1[:, j]) * alpha)
+            beta_item[j] = beta_item[j] - (np.nansum(g_b_item[:, j]) * alpha)
 
         if np.linalg.norm(np.nansum(beta_user - beta_prev_user)) < 0.01 and np.linalg.norm(
                 np.nansum(beta_item - beta_prev_item)) < 0.01:
