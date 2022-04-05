@@ -14,8 +14,8 @@ def ls_recommender(r, alpha=0.001) -> np.ndarray:
         for index in not_nan_indices:
             y_pred[index[0]][index[1]] = beta_user[index[0]] + beta_item[index[1]]
 
-        g_b0 = -1 * np.nansum(np.dstack((r, -y_pred)), 2)
-        g_b1 = -1 * np.nansum(np.dstack((r, -y_pred)), 2)
+        g_b_user = -1 * np.nansum(np.dstack((r, -y_pred)), 2)
+        g_b_item = -1 * np.nansum(np.dstack((r, -y_pred)), 2)
 
         # print(f"({i}) beta_user: {beta_user}, beta_item: {beta_item}, gradient: {g_b0} {g_b1}")
 
@@ -23,10 +23,10 @@ def ls_recommender(r, alpha=0.001) -> np.ndarray:
         beta_prev_item = np.copy(beta_item)
 
         for i in range(len(beta_user)):
-            beta_user[i] = beta_user[i] - (np.nansum(g_b0[i]) * alpha)
+            beta_user[i] = beta_user[i] - (np.nansum(g_b_user[i]) * alpha)
 
         for j in range(len(beta_item)):
-            beta_item[j] = beta_item[j] - (np.nansum(g_b1[:, j]) * alpha)
+            beta_item[j] = beta_item[j] - (np.nansum(g_b_item[:, j]) * alpha)
 
         if np.linalg.norm(beta_user - beta_prev_user) < 0.0001 and np.linalg.norm(beta_item - beta_prev_item) < 0.0001:
             print(f"I do early stoping at iteration {iteration}")
